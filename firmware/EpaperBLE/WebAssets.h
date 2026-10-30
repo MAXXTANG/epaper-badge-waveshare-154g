@@ -8,7 +8,7 @@ const char WEB_INDEX[] PROGMEM = R"PAPERWEB(<!doctype html>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f5f3ee">
 <title>epaper badge · 電子紙傳圖</title>
-<link rel="stylesheet" href="/style.css">
+<link rel="stylesheet" href="/style.css?v=3.0">
 </head>
 <body>
 <main>
@@ -36,90 +36,131 @@ const char WEB_INDEX[] PROGMEM = R"PAPERWEB(<!doctype html>
         <p class="hint">原圖本身有白邊時，可放大並拖曳調整。</p>
         <div class="tools"><button id="rotate">↶ 旋轉 90°</button><button id="reset">重設位置</button></div>
         <label class="toggle dither"><input id="dither" type="checkbox" checked> 用點陣保留照片層次</label>
+        <div class="tone-box">
+          <div class="range-label"><label for="brightness">圖片明暗</label><output id="brightnessValue">標準</output></div>
+          <input id="brightness" type="range" min="-40" max="40" value="0" step="20">
+          <div class="tone-presets"><button id="darker">− 調暗</button><button id="normal">標準</button><button id="lighter">＋ 調亮</button></div>
+          <p class="hint">先看預覽再傳送；已上傳的圖片也能直接套用明暗。</p>
+          <button id="applyBrightness" disabled>套用到目前電子紙</button>
+          <p class="hint" id="deviceTone">請先傳一張圖片，以啟用機身明暗調整。</p>
+        </div>
       </div>
       <button id="send" class="send" disabled>傳送到電子紙 <span>→</span></button>
       <div class="status" role="status" aria-live="polite"><span id="status">選一張照片，調整好後就能傳送。</span><progress id="progress" hidden></progress></div>
-      <details><summary>第一次使用</summary><ol><li>在 iPhone「設定 → Wi-Fi」連上 <b>Paper154G</b>，使用裝置擁有者設定的 Wi-Fi 密碼。</li><li>在 Safari 開啟 <b>http://192.168.4.1</b>。</li><li>選照片、調整預覽，再按傳送。畫面刷新約需 20 秒。</li></ol><p>此 Wi-Fi 提供本機傳圖功能，沒有網際網路。使用時請保持板子供電。</p></details>
+      <details><summary>使用方式與機身按鈕</summary><ol><li>在 iPhone「設定 → Wi-Fi」連上 <b>Paper154G</b>，使用裝置擁有者設定的 Wi-Fi 密碼。</li><li>在 Safari 開啟 <b>http://192.168.4.1</b>。</li><li>選照片、調整預覽，再按傳送。每次套用明暗也需要刷新約 20 秒。</li></ol><p><b>BOOT 短按：調亮</b>；<b>PWR 短按：調暗</b>。BOOT 長按 1 秒回到標準；PWR 長按 2 秒可在電池供電時關機。</p><p>此 Wi-Fi 提供本機傳圖功能，沒有網際網路。操作按鈕時請保持供電；開機或插 USB 時按住 BOOT 仍會進入下載模式。</p></details>
     </div>
   </section>
   <footer><span>一張小螢幕，一個喜歡的畫面。</span><span>Wi-Fi · 四色電子紙</span></footer>
 </main>
-<script type="module" src="/app.mjs"></script>
+<script type="module" src="/app.mjs?v=3.0"></script>
 </body>
 </html>
 )PAPERWEB";
 
 const char WEB_STYLE[] PROGMEM = R"PAPERWEB(:root{font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Noto Sans TC",sans-serif;color:#20282a;background:#f5f3ee;font-synthesis:none}*{box-sizing:border-box}body{margin:0}main{max-width:1040px;margin:auto;padding:36px 30px 24px}header,.brand,.card-head,.preview-footer,.range-label,.tools,footer{display:flex;align-items:center;justify-content:space-between}header{margin-bottom:32px;gap:12px}.brand{gap:13px}.logo{position:relative;border:1.6px solid #222c2f;border-radius:9px;width:42px;height:46px;display:grid;place-items:center;font:700 25px Georgia}.logo span{font:14px sans-serif;position:absolute;right:-6px;bottom:-3px;background:#f5f3ee;border-radius:50%;color:#d45a35}.brand strong{font-size:21px;letter-spacing:-.6px}.brand p{font-size:12px;color:#6b7474;margin:5px 0 0}.device{font-size:12px;padding:8px 10px;border:1px solid #dbded6;border-radius:20px;white-space:nowrap;background:#fff}.device.online{color:#34704a}.device.online:before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:#5b8b5c;margin-right:6px}.workspace{display:grid;grid-template-columns:1.1fr 1fr;gap:38px}.preview-card{background:#fff;border:1px solid #e2e1da;padding:22px 22px 18px;border-radius:22px;box-shadow:0 12px 30px #222c2f04;align-self:start}.card-head{margin-bottom:22px}.eyebrow{font-size:13px;font-weight:600}.size{font:11px ui-monospace,SFMono-Regular,monospace;color:#7c8482}.preview-wrap{max-width:370px;margin:auto;position:relative;aspect-ratio:1;overflow:hidden;border:1px solid #cccac1;border-radius:5px;box-shadow:0 6px 14px #00000009;background:white}canvas{display:block;width:100%;height:100%;image-rendering:pixelated;touch-action:none;cursor:grab}canvas:active{cursor:grabbing}.empty{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#faf9f5;pointer-events:none}.empty[hidden]{display:none}.empty>span{font-size:34px;font-weight:200;color:#b3b6aa;margin-bottom:16px}.empty strong{font-size:15px;font-weight:500}.empty p{font-size:11px;color:#91958d;margin:10px 0}.preview-footer{margin-top:20px}.swatches{display:flex;gap:5px}.swatches i{width:14px;height:14px;background:#20282a;border-radius:50%}.swatches i:nth-child(2){background:#fff;border:1px solid #d7d8d0}.swatches i:nth-child(3){background:#ecd32d}.swatches i:nth-child(4){background:#cb4f34}.toggle{display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer}.toggle input{accent-color:#d85c37;width:15px;height:15px;margin:0}.caption{font-size:10px;color:#92978e;line-height:1.7;margin:16px 0 0}.controls{padding-top:3px;min-width:0}.choose{border:1px solid #d6d9d1;border-radius:13px;background:#fff;padding:18px;display:flex;align-items:center;gap:12px;cursor:pointer;font-size:15px;font-weight:600}.choose svg{width:23px;height:23px;fill:none;stroke:#53655a;stroke-width:1.4}.arrow{margin-left:auto;color:#748176;font-size:21px}.file-input{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden}.choose:focus-within{outline:2px solid #d85c37}.filename{font-size:11px;color:#7f897d;margin:10px 2px 24px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.settings{padding:0 2px}.label,.range-label{font-size:12px;font-weight:600}.segments{display:grid;grid-template-columns:1fr 1fr;background:#e9e9e1;padding:4px;border-radius:11px;margin-top:10px;gap:4px}button{font:inherit;cursor:pointer;border:0;-webkit-tap-highlight-color:transparent}button:focus-visible,input:focus-visible,label.choose:focus-visible{outline:2px solid #d85c37;outline-offset:3px}.segments button{font-size:13px;background:transparent;padding:11px 6px;border-radius:8px;color:#768076}.segments button.selected{background:white;color:#263c32;box-shadow:0 1px 5px #24372c12}.hint{font-size:11px;color:#838c80;margin:9px 0 0;line-height:1.7}.range-label{margin:24px 0 8px}.range-label output{font:12px ui-monospace,SFMono-Regular,monospace;color:#67745e}input[type=range]{width:100%;accent-color:#d85c37;height:28px;margin:0}.tools{gap:10px;margin:18px 0 19px}.tools button{flex:1;background:transparent;border:1px solid #d8dcd1;border-radius:8px;padding:10px 5px;color:#63715f;font-size:12px}.dither{color:#616f5b;margin-bottom:26px}.send{display:flex;align-items:center;justify-content:space-between;width:100%;background:#263e32;border-radius:12px;color:white;font-size:15px;font-weight:500;padding:18px 20px}.send span{font-size:22px;font-weight:300;line-height:1}.send:disabled{background:#d7ddd3;color:#8a9685;cursor:default}.status{min-height:52px;font-size:12px;color:#778373;line-height:1.7;padding:12px 2px}.status.error{color:#b14030}progress{width:100%;height:5px;accent-color:#d85c37;margin-top:8px}progress[hidden]{display:none}details{border-top:1px solid #dfe2d7;padding-top:15px;font-size:12px;color:#718169;line-height:1.9}summary{cursor:pointer}details ol{padding-left:20px}details p{font-size:11px}footer{color:#9a9f93;font-size:10px;padding-top:30px;margin-top:24px;border-top:1px solid #e0e3d7;gap:15px}@media(max-width:650px){main{padding:23px 20px 25px}header{margin-bottom:23px}.brand strong{font-size:19px}.brand p{font-size:10px}.logo{width:34px;height:39px;font-size:22px}.device{font-size:10px;padding:7px 8px}.workspace{grid-template-columns:1fr;gap:24px}.preview-card{padding:18px;border-radius:18px}.card-head{margin-bottom:17px}.preview-wrap{max-width:300px}.caption{font-size:10px}.controls{padding:0 1px}.filename{margin-bottom:21px}.range-label{margin-top:19px}.dither{margin-bottom:22px}footer{margin-top:22px;padding-top:21px}}@media(prefers-reduced-motion:no-preference){button,.device{transition:background .16s,color .16s}}
+.tone-box{border-top:1px solid #dfe2d7;margin:0 0 24px;padding-top:1px}.tone-box .range-label{margin-top:18px}.tone-presets{display:flex;gap:8px;margin:7px 0 10px}.tone-presets button{flex:1;padding:10px 6px;border-radius:8px;background:#e8e9e1;color:#54664f;font-size:12px}#applyBrightness{width:100%;border:1px solid #b7c1b0;background:transparent;color:#37543c;border-radius:9px;font-size:12px;padding:12px 6px;margin-top:12px}#applyBrightness:disabled{opacity:.45;cursor:default}.tone-presets button:disabled{opacity:.45;cursor:default}
 )PAPERWEB";
 
-const char WEB_APP[] PROGMEM = R"PAPERWEB(import {SIZE,COLORS,layout,quantize} from './image.mjs';
+const char WEB_APP[] PROGMEM = R"PAPERWEB(import {SIZE,layout,quantize,toneChannel,rgbaToRgb,rgbToRgba} from './image.mjs?v=3.0';
 const $=id=>document.getElementById(id);
 const source=document.createElement('canvas');source.width=source.height=SIZE;
-const ctx=source.getContext('2d',{willReadFrequently:true});
-const preview=$('preview').getContext('2d');
-let image=null,url=null,mode='fit',rotation=0,zoom=1,panX=0,panY=0,packed=null,busy=false,online=false,polling=false,job=null;
+const ctx=source.getContext('2d',{willReadFrequently:true}),preview=$('preview').getContext('2d');
+let image=null,url=null,mode='fit',rotation=0,zoom=1,panX=0,panY=0,rgbFrame=null;
+let busy=false,online=false,polling=false,loadingSource=false,hasSource=false,toneDirty=false,brightness=0;
+let imageTag=0,deviceComposition=null,loadedSourceId=null,isRemote=false,lastDevice=null;
 const say=(text,error=false)=>{$('status').textContent=text;document.querySelector('.status').classList.toggle('error',error);};
-function buttons(){ $('send').disabled=!packed||busy||!online; $('send').firstChild.textContent=busy?'電子紙處理中… ':'傳送到電子紙 '; ['file','fit','fill','zoom','rotate','reset','fourColor','dither'].forEach(id=>{$(id).disabled=busy;}); }
+const composition=()=>[imageTag,mode,rotation,zoom,panX,panY].join('|');
+const toneLabel=n=>n===0?'標準':(n>0?'+':'')+n;
+function buttons(){
+  $('send').disabled=!rgbFrame||busy||!online;$('send').firstChild.textContent=busy?'電子紙處理中… ':'傳送到電子紙 ';
+  ['file','fit','fill','zoom','rotate','reset','fourColor','dither','brightness','darker','normal','lighter'].forEach(id=>{$(id).disabled=busy;});
+  $('applyBrightness').disabled=busy||!online||!hasSource||composition()!==deviceComposition;
+}
 function render(){
-  if(!image)return;
-  const t=layout(image.naturalWidth,image.naturalHeight,mode,zoom,rotation,panX,panY);panX=t.panX;panY=t.panY;
+  $('brightnessValue').textContent=toneLabel(brightness);
+  if(!image){buttons();return;}
+  const w=image.naturalWidth||image.width,h=image.naturalHeight||image.height;
+  const t=layout(w,h,mode,zoom,rotation,panX,panY);panX=t.panX;panY=t.panY;
   ctx.setTransform(1,0,0,1,0,0);ctx.fillStyle='#fff';ctx.fillRect(0,0,SIZE,SIZE);
-  ctx.save();ctx.translate(SIZE/2+panX,SIZE/2+panY);ctx.rotate(rotation*Math.PI/180);ctx.scale(t.scale,t.scale);
-  ctx.drawImage(image,-image.naturalWidth/2,-image.naturalHeight/2);ctx.restore();
-  const rgba=ctx.getImageData(0,0,SIZE,SIZE),out=quantize(rgba.data,$('dither').checked);packed=out.packed;
-  preview.putImageData($('fourColor').checked?new ImageData(out.preview,SIZE,SIZE):rgba,0,0);
+  ctx.save();ctx.translate(SIZE/2+panX,SIZE/2+panY);ctx.rotate(rotation*Math.PI/180);ctx.scale(t.scale,t.scale);ctx.drawImage(image,-w/2,-h/2);ctx.restore();
+  const rgba=ctx.getImageData(0,0,SIZE,SIZE);rgbFrame=rgbaToRgb(rgba.data);
+  const out=quantize(rgba.data,$('dither').checked,brightness);
+  if($('fourColor').checked)preview.putImageData(new ImageData(out.preview,SIZE,SIZE),0,0);
+  else{for(let i=0;i<rgba.data.length;i++)if(i%4!==3)rgba.data[i]=toneChannel(rgba.data[i],brightness);preview.putImageData(rgba,0,0);}
   $('zoomValue').textContent=Math.round(zoom*100)+'%';buttons();
 }
-function reset(){zoom=1;panX=panY=0;$('zoom').value=100;render();}
-function setMode(value){mode=value;['fit','fill'].forEach(id=>{$(id).classList.toggle('selected',id===mode);$(id).setAttribute('aria-pressed',String(id===mode));});$('modeHint').textContent=mode==='fit'?'保留整張照片；非正方形照片會留白。':'填滿螢幕，超出邊緣的部分會被裁切。';reset();}
+function resetPosition(){zoom=1;panX=panY=0;$('zoom').value=100;render();}
+function setMode(value){mode=value;['fit','fill'].forEach(id=>{$(id).classList.toggle('selected',id===mode);$(id).setAttribute('aria-pressed',String(id===mode));});$('modeHint').textContent=mode==='fit'?'保留整張照片；非正方形照片會留白。':'填滿螢幕，超出邊緣的部分會被裁切。';resetPosition();}
+function setBrightness(value,dirty=true){brightness=Math.max(-40,Math.min(40,value));$('brightness').value=brightness;if(dirty)toneDirty=true;render();}
 $('fit').onclick=()=>setMode('fit');$('fill').onclick=()=>setMode('fill');
 $('zoom').oninput=()=>{zoom=Number($('zoom').value)/100;render();};
-$('reset').onclick=()=>{rotation=0;setMode('fit');};
-$('rotate').onclick=()=>{rotation=(rotation+270)%360;reset();};
-$('fourColor').onchange=render;$('dither').onchange=render;
+$('reset').onclick=()=>{rotation=0;setMode('fit');};$('rotate').onclick=()=>{rotation=(rotation+270)%360;resetPosition();};
+$('fourColor').onchange=render;$('dither').onchange=()=>{toneDirty=true;render();};
+$('brightness').oninput=()=>setBrightness(Number($('brightness').value));
+$('darker').onclick=()=>setBrightness(brightness-20);$('normal').onclick=()=>setBrightness(0);$('lighter').onclick=()=>setBrightness(brightness+20);
 $('file').onchange=async()=>{
-  const file=$('file').files[0];if(!file)return;
-  const previous=url;url=URL.createObjectURL(file);
-  const next=new Image();
-  try{next.src=url;await next.decode();image=next;rotation=0;setMode(mode);$('empty').hidden=true;$('filename').textContent=file.name+' · '+image.naturalWidth+' × '+image.naturalHeight;say('拖曳預覽可調整位置，確認後按傳送。');}
-  catch{say('無法讀取這張照片，請改選 JPEG 或 PNG 圖片。',true);}
-  finally{if(previous)URL.revokeObjectURL(previous);}
+  const file=$('file').files[0];if(!file)return;const previous=url;url=URL.createObjectURL(file);const next=new Image();
+  try{next.src=url;await next.decode();image=next;imageTag++;isRemote=false;rotation=0;setMode(mode);$('empty').hidden=true;$('filename').textContent=file.name+' · '+image.naturalWidth+' × '+image.naturalHeight;say('可調整裁切與明暗，確認預覽後按傳送。');}
+  catch{say('無法讀取這張照片，請改選 JPEG 或 PNG 圖片。',true);}finally{if(previous)URL.revokeObjectURL(previous);}
 };
 let drag=null;
 $('preview').onpointerdown=e=>{if(!image||busy)return;$('preview').setPointerCapture(e.pointerId);drag={x:e.clientX,y:e.clientY,panX,panY};};
 $('preview').onpointermove=e=>{if(!drag)return;const scale=SIZE/$('preview').getBoundingClientRect().width;panX=drag.panX+(e.clientX-drag.x)*scale;panY=drag.panY+(e.clientY-drag.y)*scale;render();};
 $('preview').onpointerup=$('preview').onpointercancel=()=>{drag=null;};
-async function status(){
-  const response=await fetch('/api/status',{cache:'no-store',signal:AbortSignal.timeout(6000)});
-  if(!response.ok)throw new Error('裝置暫時無法回覆');
-  return response.json();
+async function status(){const response=await fetch('/api/status',{cache:'no-store',signal:AbortSignal.timeout(6000)});if(!response.ok)throw new Error('裝置暫時無法回覆');return response.json();}
+function deviceStatus(s){
+  lastDevice=s;hasSource=Boolean(s.has_source);online=true;$('device').textContent=s.busy||s.pending?'刷新中':'電子紙已連線';$('device').classList.add('online');
+  $('deviceTone').textContent=hasSource?'目前電子紙：'+toneLabel(s.applied_brightness??0)+(s.pending?'，已排程 '+toneLabel(s.brightness):'')+(s.source_saved===false&&!s.busy?'（本次原圖尚未保存，請保持供電）':''):'請先重新傳一張圖片，以啟用機身明暗調整。';
+  if(!toneDirty){$('dither').checked=s.dither!==false;setBrightness(s.brightness??0,false);}
+}
+async function loadDeviceSource(s){
+  if(loadingSource||!s.has_source||s.busy||s.source_id===loadedSourceId)return;
+  if(image&&!isRemote&&composition()!==deviceComposition){deviceComposition=null;return;}loadingSource=true;const initialTag=imageTag;
+  try{
+    const response=await fetch('/api/source',{cache:'no-store',signal:AbortSignal.timeout(10000)});if(!response.ok)return;
+    const rgb=new Uint8Array(await response.arrayBuffer());if(polling||imageTag!==initialTag)return;
+    const canvas=document.createElement('canvas');canvas.width=canvas.height=SIZE;
+    canvas.getContext('2d').putImageData(new ImageData(rgbToRgba(rgb),SIZE,SIZE),0,0);image=canvas;imageTag++;isRemote=true;rotation=0;setMode('fit');
+    $('empty').hidden=true;$('filename').textContent='目前電子紙圖片 · 200 × 200';loadedSourceId=s.source_id;deviceComposition=composition();say('已載入目前圖片，可調整明暗後套用。');buttons();
+  }catch{say('目前圖片暫時無法載入，請稍後重新整理。',true);}finally{loadingSource=false;}
 }
 async function connect(){
-  try{const s=await status();online=true;$('device').textContent=s.busy?'刷新中':'電子紙已連線';$('device').classList.add('online');busy=s.busy;
-    if(s.busy)say('電子紙正在處理，完成後即可傳送下一張。');
-  }catch{online=false;$('device').textContent='未連上電子紙';$('device').classList.remove('online');if(!image)say('請連上 Paper154G Wi-Fi，再用 Safari 開啟 http://192.168.4.1。');}
+  if(polling)return;
+  try{const s=await status();if(polling)return;deviceStatus(s);busy=Boolean(s.busy||s.pending);await loadDeviceSource(s);if(polling)return;if(s.busy||s.pending)say('電子紙正在調整或刷新，完成後即可繼續操作。');}
+  catch{online=false;$('device').textContent='未連上電子紙';$('device').classList.remove('online');if(!image)say('請連上 Paper154G Wi-Fi，再用 Safari 開啟 http://192.168.4.1。');}
   buttons();
 }
-$('send').onclick=async()=>{
-  if(!packed||busy)return;busy=true;polling=true;buttons();$('progress').hidden=false;$('progress').removeAttribute('value');say('正在傳送圖片…');
-  // Freeze the exact frame corresponding to the displayed preview.
-  const frame=new Uint8Array(packed);const data=new FormData();data.append('frame',new Blob([frame],{type:'application/octet-stream'}),'frame.bin');
+async function waitForJob(job){
+  const started=Date.now();let failures=0;
+  while(Date.now()-started<100000){
+    await new Promise(resolve=>setTimeout(resolve,1200));let s;
+    try{s=await status();failures=0;}catch{if(++failures<5)continue;throw new Error('連線中斷，請確認仍連著 Paper154G Wi-Fi。');}
+    if(s.job<job)throw new Error('裝置已重新啟動，請重新傳送。');
+    if(!s.busy&&!s.pending){if(!s.ok)throw new Error(s.error||'電子紙刷新失敗，請重試。');return s;}
+  }
+  throw new Error('刷新尚未完成，請確認供電，稍候重新整理查看。');
+}
+async function submit(endpoint,body,successText){
+  busy=true;polling=true;buttons();$('progress').hidden=false;$('progress').removeAttribute('value');say('正在傳送…');
   try{
-    const response=await fetch('/api/frame',{method:'POST',body:data,signal:AbortSignal.timeout(15000)});
-    const result=await response.json();if(!response.ok)throw new Error(result.error||'圖片傳送失敗');job=result.job;
-    say('圖片已收到，電子紙刷新中，約需 20 秒…');
-    const started=Date.now();let failures=0;
-    while(Date.now()-started<90000){
-      await new Promise(resolve=>setTimeout(resolve,1200));
-      let s;try{s=await status();failures=0;}catch{if(++failures<5)continue;throw new Error('連線中斷，請確認仍連著 Paper154G Wi-Fi，再重新整理查看。');}
-      if(s.job!==job)throw new Error('裝置已重新啟動，請重新傳送圖片。');
-      if(!s.busy){if(!s.ok)throw new Error(s.error||'電子紙未完成刷新，請稍候重試。');say('完成！圖片已顯示在電子紙上。');return;}
-    }
-    throw new Error('刷新尚未完成，請確認板子供電，稍候重新整理查看狀態。');
-  }catch(error){say(error.message||'傳送失敗，請確認 Wi-Fi 連線後重試。',true);}
+    const response=await fetch(endpoint,{method:'POST',body,signal:AbortSignal.timeout(20000)});const result=await response.json();if(!response.ok)throw new Error(result.error||'傳送失敗');
+    say('已收到，正在套用明暗並刷新，約需 20 秒…');const s=await waitForJob(result.job);
+    toneDirty=false;deviceStatus(s);loadedSourceId=s.source_id;deviceComposition=composition();
+    say(s.source_saved===false?'畫面已更新；原圖尚未保存，請保持供電並重新傳送。':successText);
+  }catch(error){const network=['TypeError','SyntaxError','TimeoutError','AbortError'].includes(error.name);say(network?'連線暫時中斷，請確認 Wi-Fi 後重試。':error.message,true);}
   finally{busy=false;polling=false;$('progress').hidden=true;buttons();connect();}
+}
+$('send').onclick=async()=>{
+  if(!rgbFrame||busy)return;
+  const data=new FormData();data.append('brightness',String(brightness));data.append('dither',$('dither').checked?'1':'0');
+  data.append('frame',new Blob([new Uint8Array(rgbFrame)],{type:'application/octet-stream'}),'source.rgb');
+  await submit('/api/frame',data,'完成！可用 BOOT 調亮、PWR 調暗。');
 };
-connect();setInterval(()=>{if(!polling)connect();},6000);
+$('applyBrightness').onclick=async()=>{
+  if(busy||!hasSource)return;
+  await submit('/api/brightness',new URLSearchParams({value:String(brightness),dither:$('dither').checked?'1':'0'}),'明暗已更新，可繼續用網頁或機身按鈕調整。');
+};
+connect();setInterval(()=>{if(!polling)connect();},3000);
 )PAPERWEB";
 
 const char WEB_IMAGE[] PROGMEM = R"PAPERWEB(export const SIZE = 200;
@@ -139,7 +180,16 @@ export function nearest(r,g,b) {
   });
   return code;
 }
-export function quantize(rgba,dither=true) {
+export function toneChannel(value,brightness){return Math.max(0,Math.min(255,value+brightness*2.55));}
+export function rgbaToRgb(rgba){
+  if(rgba.length!==SIZE*SIZE*4)throw new Error('Image must be 200 × 200');
+  const rgb=new Uint8Array(SIZE*SIZE*3);for(let p=0;p<SIZE*SIZE;p++)rgb.set(rgba.subarray(p*4,p*4+3),p*3);return rgb;
+}
+export function rgbToRgba(rgb){
+  if(rgb.length!==SIZE*SIZE*3)throw new Error('Invalid RGB image');
+  const rgba=new Uint8ClampedArray(SIZE*SIZE*4);for(let p=0;p<SIZE*SIZE;p++){rgba.set(rgb.subarray(p*3,p*3+3),p*4);rgba[p*4+3]=255;}return rgba;
+}
+export function quantize(rgba,dither=true,brightness=0) {
   if(rgba.length!==SIZE*SIZE*4) throw new Error('Image must be 200 × 200');
   const packed=new Uint8Array(SIZE*SIZE/4),preview=new Uint8ClampedArray(rgba.length);
   const error=[new Float32Array((SIZE+2)*3),new Float32Array((SIZE+2)*3)];
@@ -148,7 +198,7 @@ export function quantize(rgba,dither=true) {
     const dir=y%2?-1:1;
     for(let xi=0;xi<SIZE;xi++) {
       const x=dir===1?xi:SIZE-1-xi,pos=y*SIZE+x,at=pos*4;
-      const value=[0,1,2].map(c=>Math.max(0,Math.min(255,rgba[at+c]+(dither?cur[(x+1)*3+c]:0))));
+      const value=[0,1,2].map(c=>Math.max(0,Math.min(255,toneChannel(rgba[at+c],brightness)+(dither?cur[(x+1)*3+c]:0))));
       const code=nearest(...value),color=COLORS[code];
       packed[pos>>2]|=code<<((3-pos%4)*2);
       for(let c=0;c<3;c++) {

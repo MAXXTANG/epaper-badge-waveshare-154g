@@ -1,8 +1,8 @@
 {
   "model": "ESP32-S3-ePaper-1.54G",
-  "version": "2.1",
-  "app_bytes": 1200912,
-  "app_sha256": "292d85548294b11e4f78defd8181132414d6e59e7620e892a745de9d6efae80e",
+  "version": "3.0",
+  "app_bytes": 1250048,
+  "app_sha256": "e2a4cc06501770b6da5f0923efcef4d503681eaed833c4153c80c4472ff134d4",
   "arduino_esp32": "3.3.12",
   "ble_name": "Paper154G",
   "service": "6e400001-b5a3-f393-e0a9-e50e24dcca9e",
@@ -12,7 +12,19 @@
   "transfer_mode": "With Response",
   "wifi_ssid": "Paper154G",
   "wifi_url": "http://192.168.4.1",
-  "web_frame_bytes": 10000,
-  "persistence": "physical e-paper retention + NVS has-image marker",
-  "ui_name": "epaper badge"
+  "persistence": "CRC32-protected RGB source in LittleFS + NVS tone settings + physical e-paper retention",
+  "ui_name": "epaper badge",
+  "web_source_bytes": 120000,
+  "packed_display_bytes": 10000,
+  "brightness_levels": [
+    -40,
+    -20,
+    0,
+    20,
+    40
+  ],
+  "buttons": {
+    "BOOT": "short: lighter; hold 1s: normal",
+    "PWR": "short: darker; hold 2s: battery power off"
+  }
 }

@@ -4,7 +4,7 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f5f3ee">
 <title>epaper badge · 電子紙傳圖</title>
-<link rel="stylesheet" href="/style.css">
+<link rel="stylesheet" href="/style.css?v=3.0">
 </head>
 <body>
 <main>
@@ -32,14 +32,22 @@
         <p class="hint">原圖本身有白邊時，可放大並拖曳調整。</p>
         <div class="tools"><button id="rotate">↶ 旋轉 90°</button><button id="reset">重設位置</button></div>
         <label class="toggle dither"><input id="dither" type="checkbox" checked> 用點陣保留照片層次</label>
+        <div class="tone-box">
+          <div class="range-label"><label for="brightness">圖片明暗</label><output id="brightnessValue">標準</output></div>
+          <input id="brightness" type="range" min="-40" max="40" value="0" step="20">
+          <div class="tone-presets"><button id="darker">− 調暗</button><button id="normal">標準</button><button id="lighter">＋ 調亮</button></div>
+          <p class="hint">先看預覽再傳送；已上傳的圖片也能直接套用明暗。</p>
+          <button id="applyBrightness" disabled>套用到目前電子紙</button>
+          <p class="hint" id="deviceTone">請先傳一張圖片，以啟用機身明暗調整。</p>
+        </div>
       </div>
       <button id="send" class="send" disabled>傳送到電子紙 <span>→</span></button>
       <div class="status" role="status" aria-live="polite"><span id="status">選一張照片，調整好後就能傳送。</span><progress id="progress" hidden></progress></div>
-      <details><summary>第一次使用</summary><ol><li>在 iPhone「設定 → Wi-Fi」連上 <b>Paper154G</b>，使用裝置擁有者設定的 Wi-Fi 密碼。</li><li>在 Safari 開啟 <b>http://192.168.4.1</b>。</li><li>選照片、調整預覽，再按傳送。畫面刷新約需 20 秒。</li></ol><p>此 Wi-Fi 提供本機傳圖功能，沒有網際網路。使用時請保持板子供電。</p></details>
+      <details><summary>使用方式與機身按鈕</summary><ol><li>在 iPhone「設定 → Wi-Fi」連上 <b>Paper154G</b>，使用裝置擁有者設定的 Wi-Fi 密碼。</li><li>在 Safari 開啟 <b>http://192.168.4.1</b>。</li><li>選照片、調整預覽，再按傳送。每次套用明暗也需要刷新約 20 秒。</li></ol><p><b>BOOT 短按：調亮</b>；<b>PWR 短按：調暗</b>。BOOT 長按 1 秒回到標準；PWR 長按 2 秒可在電池供電時關機。</p><p>此 Wi-Fi 提供本機傳圖功能，沒有網際網路。操作按鈕時請保持供電；開機或插 USB 時按住 BOOT 仍會進入下載模式。</p></details>
     </div>
   </section>
   <footer><span>一張小螢幕，一個喜歡的畫面。</span><span>Wi-Fi · 四色電子紙</span></footer>
 </main>
-<script type="module" src="/app.mjs"></script>
+<script type="module" src="/app.mjs?v=3.0"></script>
 </body>
 </html>

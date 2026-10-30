@@ -2,6 +2,9 @@
 #include <stdio.h>
 #include <vector>
 #include "../firmware/EpaperBLE/Palette.h"
+#include "../firmware/EpaperBLE/Tone.h"
+#include "../firmware/EpaperBLE/ButtonInput.h"
+#include "../firmware/EpaperBLE/SourceFormat.h"
 
 static std::vector<uint8_t> packet(uint16_t w,uint16_t h,uint8_t depth,uint8_t r,uint8_t g,uint8_t b) {
   std::vector<uint8_t> p={'!','I',depth,uint8_t(w),uint8_t(w>>8),uint8_t(h),uint8_t(h>>8)};
@@ -52,5 +55,26 @@ int main() {
   image.reset(); auto p=packet(240,240,24,20,30,40);
   image.feed(p.data(),100); assert(image.active() && !image.ready());
   image.reset();assert(image.feed(p.data(),p.size())==ImageReceiver::Result::Complete);
-  puts("PASS: RGB565/RGB888 chunking, CRC, size bounds, interrupted transfers, resize, palette packing (ASan/UBSan)");
+  std::vector<uint8_t> source(epaper::kRgbBytes,128);epaper::resizeRgb(image,source.data());
+  assert(epaper::validTone(-40)&&epaper::validTone(40)&&!epaper::validTone(10)&&!epaper::validTone(60));
+  assert(epaper::clampTone(-60)==-40&&epaper::clampTone(60)==40);
+  assert(epaper::toneChannel(0,-40)==0&&epaper::toneChannel(255,40)==255);
+  std::fill(source.begin(),source.end(),128);
+  double previous=-1;
+  for(int level=-40;level<=40;level+=20){
+    epaper::quantizeRgb(source.data(),frame.data(),level);double sum=0;
+    for(int p=0;p<200*200;p++){int code=(frame[p/4]>>((3-p%4)*2))&3;const double luma[]={0,255,212,85};sum+=luma[code];}
+    assert(sum>previous);previous=sum;
+  }
+  uint8_t header[epaper::kSourceHeaderBytes];epaper::sourceHeader(header,source.data(),source.size());
+  assert(epaper::validSource(header,source.data(),source.size()));source[20]^=1;assert(!epaper::validSource(header,source.data(),source.size()));
+  const uint8_t crcSample[]="123456789";assert(epaper::crc32(crcSample,9)==0xCBF43926);
+  ButtonInput button(1000);
+  assert(button.update(true,0)==ButtonInput::None);assert(button.update(false,20)==ButtonInput::None);
+  assert(button.update(true,30)==ButtonInput::None);assert(button.update(true,65)==ButtonInput::None);
+  assert(button.update(false,100)==ButtonInput::None);assert(button.update(false,135)==ButtonInput::ShortPress);
+  assert(button.update(true,200)==ButtonInput::None);assert(button.update(true,235)==ButtonInput::None);
+  assert(button.update(true,1235)==ButtonInput::LongPress);assert(button.update(true,1300)==ButtonInput::None);
+  assert(button.update(false,1400)==ButtonInput::None);assert(button.update(false,1435)==ButtonInput::None);
+  puts("PASS: image protocols, tone levels, monotonic brightness, source CRC, debounce and short/long presses (ASan/UBSan)");
 }
