@@ -53,4 +53,8 @@
 - 本機模擬瀏覽器確認：+20 預覽與傳送、−20 直接套用目前圖片、重新整理自動載入原圖及明暗值。
 - v2.1 現有韌體已備份在本機，SHA-256 與先前裝置紀錄一致。
 - v3.0 編譯通過：1,249,907 bytes（37%）；靜態 RAM 60,864 bytes（18%）。初次實機寫入校驗通過；啟動狀態 `version=3.0`、`ok=true`、兩顆按鍵均為放開狀態。升級後需先重傳圖片，啟用新的原圖保存功能。
-- 機身按鍵與真實 Wi-Fi 原圖保存的端到端驗證：等待使用者操作。
+- 真實 Wi-Fi 原圖保存已確認：裝置回報 `has_source=true`、`source_saved=true`。
+- 使用者配合實測 BOOT 短按：捕捉到 `boot_pressed=true`，明暗 `0 → +20`，job 5 刷新完成，`applied_brightness=20`。
+- 使用者配合實測 PWR 短按：明暗 `+20 → 0`，job 6 刷新完成，`applied_brightness=0`。
+- 兩次都收到 `DONE`；按鍵調整需等待電子紙約 20 秒刷新。BOOT 按住 1 秒會還原標準，故操作時應輕點後放開。
+- 重啟實測：`job=0`、`has_source=true`、`source_saved=true`、`brightness=0`、`applied_brightness=0`，原圖 CRC 驗證與明暗設定恢復成功，未重新刷新目前畫面。
