@@ -1,0 +1,17 @@
+{
+  "model": "ESP32-S3-ePaper-1.54G",
+  "version": "2.1",
+  "app_bytes": 1200880,
+  "app_sha256": "bd990a4c8f08c0ea26293c26395d9ede1f28f2fd5e827c90cab2d1c34fb40012",
+  "arduino_esp32": "3.3.12",
+  "ble_name": "Paper154G",
+  "service": "6e400001-b5a3-f393-e0a9-e50e24dcca9e",
+  "sender": "Safari Wi-Fi uploader + Bluefruit Connect BLE",
+  "source_resolution": "Standard 240x240",
+  "source_depth": 16,
+  "transfer_mode": "With Response",
+  "wifi_ssid": "Paper154G",
+  "wifi_url": "http://192.168.4.1",
+  "web_frame_bytes": 10000,
+  "persistence": "physical e-paper retention + NVS has-image marker"
+}

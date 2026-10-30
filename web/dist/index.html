@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f5f3ee">
+<title>Paper154G · 電子紙傳圖</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<main>
+  <header><div class="brand"><span class="logo" aria-hidden="true">P<span>◒</span></span><div><strong>Paper154G</strong><p>把喜歡的畫面，留在電子紙上。</p></div></div><span class="device" id="device">連線中…</span></header>
+  <section class="workspace">
+    <div class="preview-card">
+      <div class="card-head"><span class="eyebrow">你的下一張畫面</span><span class="size">200 × 200</span></div>
+      <div class="preview-wrap" id="previewWrap">
+        <canvas id="preview" width="200" height="200" aria-label="電子紙 200 × 200 預覽"></canvas>
+        <div class="empty" id="empty"><span aria-hidden="true">＋</span><strong>從一張照片開始</strong><p>選圖後，可在這裡拖曳調整位置</p></div>
+      </div>
+      <div class="preview-footer"><div class="swatches" aria-label="黑白黃紅四色"><i></i><i></i><i></i><i></i></div><label class="toggle"><input id="fourColor" type="checkbox" checked> 四色預覽</label></div>
+      <p class="caption">預覽顯示完整螢幕範圍，實際顏色會受電子紙與環境光影響。</p>
+    </div>
+    <div class="controls">
+      <label class="choose" for="file"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="9" cy="9" r="1.5"/><path d="m4 17 5-5 4 4 3-3 5 5"/></svg><span>選擇照片</span><span class="arrow">↗</span></label>
+      <input id="file" type="file" accept="image/*" class="file-input">
+      <p class="filename" id="filename">照片會在你的手機上處理。</p>
+      <div class="settings" id="settings">
+        <label class="label">顯示方式</label>
+        <div class="segments"><button id="fit" class="selected" aria-pressed="true">完整顯示</button><button id="fill" aria-pressed="false">裁切滿版</button></div>
+        <p class="hint" id="modeHint">保留整張照片；非正方形照片會留白。</p>
+        <div class="range-label"><label for="zoom">縮放</label><output id="zoomValue">100%</output></div>
+        <input id="zoom" type="range" min="100" max="200" value="100" step="1">
+        <p class="hint">原圖本身有白邊時，可放大並拖曳調整。</p>
+        <div class="tools"><button id="rotate">↶ 旋轉 90°</button><button id="reset">重設位置</button></div>
+        <label class="toggle dither"><input id="dither" type="checkbox" checked> 用點陣保留照片層次</label>
+      </div>
+      <button id="send" class="send" disabled>傳送到電子紙 <span>→</span></button>
+      <div class="status" role="status" aria-live="polite"><span id="status">選一張照片，調整好後就能傳送。</span><progress id="progress" hidden></progress></div>
+      <details><summary>第一次使用</summary><ol><li>在 iPhone「設定 → Wi-Fi」連上 <b>Paper154G</b>，使用裝置擁有者設定的 Wi-Fi 密碼。</li><li>在 Safari 開啟 <b>http://192.168.4.1</b>。</li><li>選照片、調整預覽，再按傳送。畫面刷新約需 20 秒。</li></ol><p>此 Wi-Fi 提供本機傳圖功能，沒有網際網路。使用時請保持板子供電。</p></details>
+    </div>
+  </section>
+  <footer><span>一張小螢幕，一個喜歡的畫面。</span><span>Wi-Fi · 四色電子紙</span></footer>
+</main>
+<script type="module" src="/app.mjs"></script>
+</body>
+</html>

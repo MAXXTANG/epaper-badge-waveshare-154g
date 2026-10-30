@@ -1,0 +1,11 @@
+.dev/
+backups/
+*.log
+.DS_Store
+__pycache__/
+*.py[cod]
+.env
+.env.*
+*.pem
+*.key
+firmware/EpaperBLE/DeviceSecrets.h
